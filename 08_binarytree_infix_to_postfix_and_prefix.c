@@ -16,20 +16,6 @@ void inorder(struct Node *root) {
     if (root->left || root->right) printf(")");
 }
 
-void preorder(struct Node *root) {
-    if (root == NULL) return;
-    printf("%c", root->data);
-    preorder(root->left);
-    preorder(root->right);
-}
-
-void postorder(struct Node *root) {
-    if (root == NULL) return;
-    postorder(root->left);
-    postorder(root->right);
-    printf("%c", root->data);
-}
-
 void showTree(struct Node *root, int level) {
     if (root == NULL) return;
 
@@ -50,7 +36,6 @@ int main() {
     printf("Enter infix expression (single-letter/ digit operands): ");
     scanf("%s", infix);
 
-    // INFIX TO POSTFIX (style similar to your reference code)
     for (int i = 0; infix[i] != '\0'; i++) {
         char ch = infix[i];
 
@@ -64,9 +49,9 @@ int main() {
             while (topOp != -1 && opstack[topOp] != '(') {
                 postfix[j++] = opstack[topOp--];
             }
-            topOp--; // pop '('
+            topOp--;
         }
-        else { // operator
+        else {
             int p1;
             if (ch == '+' || ch == '-') p1 = 1;
             else if (ch == '*' || ch == '/') p1 = 2;
@@ -94,7 +79,6 @@ int main() {
     }
     postfix[j] = '\0';
 
-    // BUILD EXPRESSION TREE FROM POSTFIX
     for (int i = 0; postfix[i] != '\0'; i++) {
         char ch = postfix[i];
 
@@ -104,7 +88,7 @@ int main() {
 
         if (isalnum(ch)) {
             nodestack[++topNode] = node;
-        } else { // operator
+        } else {
             node->right = nodestack[topNode--];
             node->left  = nodestack[topNode--];
             nodestack[++topNode] = node;
@@ -116,16 +100,8 @@ int main() {
     printf("\nInfix   : %s\n", infix);
     printf("Postfix : %s\n", postfix);
 
-    printf("Inorder (infix)   : ");
+    printf("Inorder (from tree): ");
     inorder(root);
-    printf("\n");
-
-    printf("Preorder (prefix) : ");
-    preorder(root);
-    printf("\n");
-
-    printf("Postorder(postfix): ");
-    postorder(root);
     printf("\n");
 
     printf("\nExpression Tree (rotated 90 degrees):\n");
