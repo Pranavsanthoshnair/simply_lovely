@@ -1,36 +1,44 @@
 #include <stdio.h>
 
-int binarySearch(int arr[], int n, int target) {
-    int left = 0, right = n - 1;
-    int steps = 0;
-    while (left <= right) {
-        steps++;
-        int mid = (left + right) / 2;
-        if (arr[mid] == target) {
-            printf("Found at index %d (Steps: %d)\n", mid, steps);
-            return mid;
-        }
-        if (arr[mid] < target)
-            left = mid + 1;
-        else
-            right = mid - 1;
-    }
-    printf("Not found (Steps: %d)\n", steps);
-    return -1;
-}
-
 int main() {
     int n, target;
-    printf("Number of elements: ");
+
+    printf("Enter size of sorted array: ");
     scanf("%d", &n);
+
     int arr[n];
-    printf("Enter %d sorted elements: ", n);
+
+    printf("Enter %d sorted elements:\n", n);
     for (int i = 0; i < n; i++)
         scanf("%d", &arr[i]);
-    printf("Search for: ");
+
+    printf("Enter element to search: ");
     scanf("%d", &target);
-    binarySearch(arr, n, target);
-    printf("\nTime: Best O(1), Worst O(log n)\n");
-    printf("Space: O(1)\n");
+
+    int low = 0, high = n - 1;
+    int foundIndex = -1;
+
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+
+        if (arr[mid] == target) {
+            foundIndex = mid;
+            break;
+        } 
+        else if (arr[mid] < target) {
+            low = mid + 1;
+        }
+        else {
+            high = mid - 1;
+        }
+    }
+
+    if (foundIndex == -1)
+        printf("Element not found.\n");
+    else
+        printf("Element found at index %d\n", foundIndex);
+
+    printf("Time complexity: O(log n)\nSpace complexity: O(1)\n");
+
     return 0;
 }
