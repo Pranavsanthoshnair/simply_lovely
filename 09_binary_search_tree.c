@@ -7,17 +7,14 @@ typedef struct Node {
     struct Node *right;
 } Node;
 
-Node* createNode(int value) {
-    Node* newNode = (Node*)malloc(sizeof(Node));
-    newNode->data = value;
-    newNode->left = NULL;
-    newNode->right = NULL;
-    return newNode;
-}
-
 Node* insertNode(Node* root, int value) {
-    if (root == NULL)
-        return createNode(value);
+    if (root == NULL) {
+        Node* newNode = (Node*)malloc(sizeof(Node));
+        newNode->data = value;
+        newNode->left = NULL;
+        newNode->right = NULL;
+        return newNode;
+    }
     if (value < root->data)
         root->left = insertNode(root->left, value);
     else if (value > root->data)
@@ -33,21 +30,15 @@ Node* searchNode(Node* root, int key) {
     return searchNode(root->right, key);
 }
 
-Node* findMin(Node* node) {
-    while (node->left != NULL)
-        node = node->left;
-    return node;
-}
-
 Node* deleteNode(Node* root, int key) {
     if (root == NULL)
         return root;
+
     if (key < root->data)
         root->left = deleteNode(root->left, key);
     else if (key > root->data)
         root->right = deleteNode(root->right, key);
     else {
-        // Node has one or no child
         if (root->left == NULL) {
             Node* temp = root->right;
             free(root);
@@ -58,8 +49,9 @@ Node* deleteNode(Node* root, int key) {
             free(root);
             return temp;
         }
-        // Node has two children: replace with smallest in right subtree
-        Node* temp = findMin(root->right);
+        Node* temp = root->right;
+        while (temp->left != NULL)
+            temp = temp->left;
         root->data = temp->data;
         root->right = deleteNode(root->right, temp->data);
     }
@@ -77,15 +69,17 @@ void inorder(Node* root) {
 int main() {
     Node* root = NULL;
     int choice, value;
+
     while (1) {
         printf("\n1. Insert  2. Delete  3. Search  4. Exit\n");
         printf("Choice: ");
         scanf("%d", &choice);
+
         if (choice == 1) {
             printf("Value: ");
             scanf("%d", &value);
             root = insertNode(root, value);
-            printf("Tree: ");
+            printf("Tree (inorder): ");
             inorder(root);
             printf("\n");
         }
@@ -98,7 +92,7 @@ int main() {
             } else {
                 printf("Not found\n");
             }
-            printf("Tree: ");
+            printf("Tree (inorder): ");
             inorder(root);
             printf("\n");
         }
@@ -114,5 +108,6 @@ int main() {
             exit(0);
         }
     }
+
     return 0;
 }
