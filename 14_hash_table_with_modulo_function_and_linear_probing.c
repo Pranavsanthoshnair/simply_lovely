@@ -16,7 +16,6 @@ int main() {
         scanf("%d", &value);
         int index = value % SIZE;
         
-        // Linear probing for collision
         while (table[index] != -1) {
             index = (index + 1) % SIZE;
         }
