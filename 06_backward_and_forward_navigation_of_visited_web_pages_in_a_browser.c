@@ -2,24 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Node {
+typedef struct Node {
     char url[100];
     struct Node *prev, *next;
-};
+} Node;
 
-struct Node *current = NULL;
+Node *current = NULL;
 
 void visit(char *url) {
-    struct Node *newPage = (struct Node *)malloc(sizeof(struct Node));
+    Node *newPage = (Node *)malloc(sizeof(Node));
     strcpy(newPage->url, url);
     newPage->prev = current;
     newPage->next = NULL;
     
     if (current) {
-        // Clear forward history
-        struct Node *temp = current->next;
+        Node *temp = current->next;
         while (temp) {
-            struct Node *del = temp;
+            Node *del = temp;
             temp = temp->next;
             free(del);
         }
