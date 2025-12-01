@@ -2,8 +2,8 @@
 
 #define MAX 100
 
-// SIMPLE QUEUE
 int q[MAX], front = -1, rear = -1, size;
+int dq[MAX], df = -1, dr = -1;
 
 void display() {
     if (front == -1) {
@@ -40,24 +40,6 @@ void dequeue() {
     }
     display();
 }
-
-void queueMenu() {
-    int choice, val;
-    while (1) {
-        printf("\n1.Enqueue 2.Dequeue 3.Exit\nChoice: ");
-        scanf("%d", &choice);
-        if (choice == 1) {
-            printf("Value: ");
-            scanf("%d", &val);
-            enqueue(val);
-        }
-        else if (choice == 2) dequeue();
-        else if (choice == 3) break;
-    }
-}
-
-// DEQUE
-int dq[MAX], df = -1, dr = -1;
 
 void displayDQ() {
     if (df == -1) {
@@ -132,38 +114,51 @@ void deleteRear() {
     displayDQ();
 }
 
-void dequeMenu() {
-    int choice, val;
-    while (1) {
-        printf("\n1.Insert Front 2.Insert Rear 3.Delete Front 4.Delete Rear 5.Exit\nChoice: ");
-        scanf("%d", &choice);
-        if (choice == 1) {
-            printf("Value: ");
-            scanf("%d", &val);
-            insertFront(val);
-        }
-        else if (choice == 2) {
-            printf("Value: ");
-            scanf("%d", &val);
-            insertRear(val);
-        }
-        else if (choice == 3) deleteFront();
-        else if (choice == 4) deleteRear();
-        else if (choice == 5) break;
-    }
-}
-
 int main() {
     int type;
-    
     printf("Select Type:\n1.Queue 2.Deque\nChoice: ");
     scanf("%d", &type);
-    
+
     printf("Enter size (max 100): ");
     scanf("%d", &size);
-    
-    if (type == 1) queueMenu();
-    else if (type == 2) dequeMenu();
-    
+
+    if (type == 1) {
+        int choice, val;
+        while (1) {
+            printf("\n1.Enqueue 2.Dequeue 3.Exit\nChoice: ");
+            scanf("%d", &choice);
+            if (choice == 1) {
+                printf("Value: ");
+                scanf("%d", &val);
+                enqueue(val);
+            } else if (choice == 2) {
+                dequeue();
+            } else if (choice == 3) {
+                break;
+            }
+        }
+    } else if (type == 2) {
+        int choice, val;
+        while (1) {
+            printf("\n1.Insert Front 2.Insert Rear 3.Delete Front 4.Delete Rear 5.Exit\nChoice: ");
+            scanf("%d", &choice);
+            if (choice == 1) {
+                printf("Value: ");
+                scanf("%d", &val);
+                insertFront(val);
+            } else if (choice == 2) {
+                printf("Value: ");
+                scanf("%d", &val);
+                insertRear(val);
+            } else if (choice == 3) {
+                deleteFront();
+            } else if (choice == 4) {
+                deleteRear();
+            } else if (choice == 5) {
+                break;
+            }
+        }
+    }
+
     return 0;
 }
