@@ -2,7 +2,7 @@
 #include <ctype.h>
 
 int main() {
-    char infix[100], postfix[100], stack[100];
+    char infix[100], postfix[200], stack[100];
     int top = -1, j = 0;
 
     scanf("%s", infix);
@@ -10,18 +10,28 @@ int main() {
     for (int i = 0; infix[i] != '\0'; i++) {
         char ch = infix[i];
 
-        if (isalnum(ch)) {
+        if (isalpha(ch)) {
             postfix[j++] = ch;
+            postfix[j++] = ' ';
+        }
+        else if (isdigit(ch)) {
+            while (isdigit(infix[i])) {
+                postfix[j++] = infix[i++];
+            }
+            postfix[j++] = ' ';
+            i--;
         }
         else if (ch == '(') {
             stack[++top] = ch;
         }
         else if (ch == ')') {
-            while (top != -1 && stack[top] != '(')
+            while (top != -1 && stack[top] != '(') {
                 postfix[j++] = stack[top--];
+                postfix[j++] = ' ';
+            }
             top--;
         }
-        else {            
+        else {
             int p1;
             if (ch == '+' || ch == '-') p1 = 1;
             else if (ch == '*' || ch == '/') p1 = 2;
@@ -36,17 +46,19 @@ int main() {
                 else if (op == '^') p2 = 3;
                 else p2 = 0;
 
-                if (p2 > p1 || (p2 == p1 && ch != '^'))
+                if (p2 > p1 || (p2 == p1 && ch != '^')) {
                     postfix[j++] = stack[top--];
-                else
-                    break;
+                    postfix[j++] = ' ';
+                } else break;
             }
             stack[++top] = ch;
         }
     }
 
-    while (top != -1)
+    while (top != -1) {
         postfix[j++] = stack[top--];
+        postfix[j++] = ' ';
+    }
 
     postfix[j] = '\0';
     printf("%s\n", postfix);
@@ -54,11 +66,20 @@ int main() {
     int eval[100], etop = -1;
     for (int i = 0; postfix[i] != '\0'; i++) {
         char ch = postfix[i];
+
+        if (ch == ' ') continue;
+
         if (isdigit(ch)) {
-            eval[++etop] = ch - '0';
+            int num = 0;
+            while (isdigit(postfix[i])) {
+                num = num * 10 + (postfix[i] - '0');
+                i++;
+            }
+            eval[++etop] = num;
+            i--;
         }
         else if (isalpha(ch)) {
-            printf("Cannot evaluate\n");
+            printf("Cannot evaluate expression containing variables\n");
             return 0;
         }
         else {
@@ -77,6 +98,6 @@ int main() {
         }
     }
 
-    printf("%d", eval[etop]);
+    printf("%d\n", eval[etop]);
     return 0;
 }
