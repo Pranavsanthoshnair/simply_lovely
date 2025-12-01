@@ -16,6 +16,20 @@ void inorder(struct Node *root) {
     if (root->left || root->right) printf(")");
 }
 
+void preorder(struct Node *root) {
+    if (root == NULL) return;
+    printf("%c", root->data);
+    preorder(root->left);
+    preorder(root->right);
+}
+
+void postorder(struct Node *root) {
+    if (root == NULL) return;
+    postorder(root->left);
+    postorder(root->right);
+    printf("%c", root->data);
+}
+
 void showTree(struct Node *root, int level) {
     if (root == NULL) return;
 
@@ -49,9 +63,9 @@ int main() {
             while (topOp != -1 && opstack[topOp] != '(') {
                 postfix[j++] = opstack[topOp--];
             }
-            topOp--;
+            topOp--; 
         }
-        else {
+        else { 
             int p1;
             if (ch == '+' || ch == '-') p1 = 1;
             else if (ch == '*' || ch == '/') p1 = 2;
@@ -88,7 +102,7 @@ int main() {
 
         if (isalnum(ch)) {
             nodestack[++topNode] = node;
-        } else {
+        } else { 
             node->right = nodestack[topNode--];
             node->left  = nodestack[topNode--];
             nodestack[++topNode] = node;
@@ -100,8 +114,16 @@ int main() {
     printf("\nInfix   : %s\n", infix);
     printf("Postfix : %s\n", postfix);
 
-    printf("Inorder (from tree): ");
+    printf("Inorder (infix)   : ");
     inorder(root);
+    printf("\n");
+
+    printf("Preorder (prefix) : ");
+    preorder(root);
+    printf("\n");
+
+    printf("Postorder(postfix): ");
+    postorder(root);
     printf("\n");
 
     printf("\nExpression Tree (rotated 90 degrees):\n");
