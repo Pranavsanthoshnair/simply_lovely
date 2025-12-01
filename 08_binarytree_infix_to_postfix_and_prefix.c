@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
 
 struct Node {
@@ -8,107 +7,129 @@ struct Node {
     struct Node *left, *right;
 };
 
-int precedence(char op) {
-    if (op == '+' || op == '-') return 1;
-    if (op == '*' || op == '/') return 2;
-    if (op == '^') return 3;
-    return 0;
-}
-
-void toPostfix(char* infix, char* postfix) {
-    char stack[100];
-    int top = -1, k = 0;
-    
-    for (int i = 0; infix[i]; i++) {
-        if (isalnum(infix[i])) {
-            postfix[k++] = infix[i];
-        }
-        else if (infix[i] == '(') {
-            stack[++top] = infix[i];
-        }
-        else if (infix[i] == ')') {
-            while (top != -1 && stack[top] != '(')
-                postfix[k++] = stack[top--];
-            top--;
-        }
-        else {
-            while (top != -1 && precedence(infix[i]) <= precedence(stack[top]))
-                postfix[k++] = stack[top--];
-            stack[++top] = infix[i];
-        }
-    }
-    
-    while (top != -1)
-        postfix[k++] = stack[top--];
-    
-    postfix[k] = '\0';
-}
-
-struct Node* createNode(char c) {
-    struct Node* node = malloc(sizeof(struct Node));
-    node->data = c;
-    node->left = node->right = NULL;
-    return node;
-}
-
-struct Node* buildTree(char* postfix) {
-    struct Node* stack[100];
-    int top = -1;
-    
-    for (int i = 0; postfix[i]; i++) {
-        struct Node* node = createNode(postfix[i]);
-        
-        if (isalnum(postfix[i])) {
-            stack[++top] = node;
-        }
-        else {
-            node->right = stack[top--];
-            node->left = stack[top--];
-            stack[++top] = node;
-        }
-    }
-    
-    return stack[top];
-}
-
-void showTree(struct Node* root, char* prefix, int isLeft) {
+void inorder(struct Node *root) {
     if (root == NULL) return;
-    
-    printf("%s%s%c\n", prefix, isLeft ? "├──" : "└──", root->data);
-    
-    char newPrefix[100];
-    strcpy(newPrefix, prefix);
-    strcat(newPrefix, isLeft ? "│   " : "    ");
-    
-    if (root->left || root->right) {
-        showTree(root->left, newPrefix, 1);
-        showTree(root->right, newPrefix, 0);
-    }
+    if (root->left || root->right) printf("(");
+    inorder(root->left);
+    printf("%c", root->data);
+    inorder(root->right);
+    if (root->left || root->right) printf(")");
 }
 
-void prefix(struct Node* root) {
+void preorder(struct Node *root) {
     if (root == NULL) return;
     printf("%c", root->data);
-    prefix(root->left);
-    prefix(root->right);
+    preorder(root->left);
+    preorder(root->right);
+}
+
+void postorder(struct Node *root) {
+    if (root == NULL) return;
+    postorder(root->left);
+    postorder(root->right);
+    printf("%c", root->data);
+}
+
+void showTree(struct Node *root, int level) {
+    if (root == NULL) return;
+
+    showTree(root->right, level + 1);
+
+    for (int i = 0; i < level; i++)
+        printf("    ");
+    printf("%c\n", root->data);
+
+    showTree(root->left, level + 1);
 }
 
 int main() {
-    char infix[100], postfix[100];
-    
-    printf("Enter infix expression: ");
-    fgets(infix, 100, stdin);
-    infix[strcspn(infix, "\n")] = 0;
-    
-    toPostfix(infix, postfix);
-    struct Node* root = buildTree(postfix);
-    
-    printf("\nInfix  : %s", infix);
-    printf("\nPostfix: %s", postfix);
-    printf("\nPrefix : ");
-    prefix(root);
-    printf("\n\nTree:\n");
-    showTree(root, "", 0);
-    
+    char infix[100], postfix[100], opstack[100];
+    struct Node *nodestack[100];
+    int topOp = -1, topNode = -1, j = 0;
+
+    printf("Enter infix expression (single-letter/ digit operands): ");
+    scanf("%s", infix);
+
+    // INFIX TO POSTFIX (style similar to your reference code)
+    for (int i = 0; infix[i] != '\0'; i++) {
+        char ch = infix[i];
+
+        if (isalnum(ch)) {
+            postfix[j++] = ch;
+        }
+        else if (ch == '(') {
+            opstack[++topOp] = ch;
+        }
+        else if (ch == ')') {
+            while (topOp != -1 && opstack[topOp] != '(') {
+                postfix[j++] = opstack[topOp--];
+            }
+            topOp--; // pop '('
+        }
+        else { // operator
+            int p1;
+            if (ch == '+' || ch == '-') p1 = 1;
+            else if (ch == '*' || ch == '/') p1 = 2;
+            else if (ch == '^') p1 = 3;
+            else p1 = 0;
+
+            while (topOp != -1) {
+                char op = opstack[topOp];
+                int p2;
+                if (op == '+' || op == '-') p2 = 1;
+                else if (op == '*' || op == '/') p2 = 2;
+                else if (op == '^') p2 = 3;
+                else p2 = 0;
+
+                if (p2 > p1 || (p2 == p1 && ch != '^')) {
+                    postfix[j++] = opstack[topOp--];
+                } else break;
+            }
+            opstack[++topOp] = ch;
+        }
+    }
+
+    while (topOp != -1) {
+        postfix[j++] = opstack[topOp--];
+    }
+    postfix[j] = '\0';
+
+    // BUILD EXPRESSION TREE FROM POSTFIX
+    for (int i = 0; postfix[i] != '\0'; i++) {
+        char ch = postfix[i];
+
+        struct Node *node = (struct Node *)malloc(sizeof(struct Node));
+        node->data = ch;
+        node->left = node->right = NULL;
+
+        if (isalnum(ch)) {
+            nodestack[++topNode] = node;
+        } else { // operator
+            node->right = nodestack[topNode--];
+            node->left  = nodestack[topNode--];
+            nodestack[++topNode] = node;
+        }
+    }
+
+    struct Node *root = nodestack[topNode];
+
+    printf("\nInfix   : %s\n", infix);
+    printf("Postfix : %s\n", postfix);
+
+    printf("Inorder (infix)   : ");
+    inorder(root);
+    printf("\n");
+
+    printf("Preorder (prefix) : ");
+    preorder(root);
+    printf("\n");
+
+    printf("Postorder(postfix): ");
+    postorder(root);
+    printf("\n");
+
+    printf("\nExpression Tree (rotated 90 degrees):\n");
+    showTree(root, 0);
+
     return 0;
 }
